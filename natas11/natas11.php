@@ -40,7 +40,7 @@ $defaultdata = array( "showpassword"=>"no", "bgcolor"=>"#ffffff");
 
 $letters = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVNBM";
 
-$first_candidates = "";
+$first_candidates = [];
 
 for ($i=0 ; $i< strlen($letters); $i++){
 	$data =  base64_encode(xor_encrypt(json_encode($defaultdata),$letters[$i]));
@@ -48,21 +48,51 @@ for ($i=0 ; $i< strlen($letters); $i++){
 		echo $data;
 		echo " ";
 		echo $letters[$i];
-		$first_candidates = $first_candidates.$letters[$i];
+		$first_candidates[] = $letters[$i];
 		echo "\n";
 	}
 }
 
-for($k=0; $k < strlen($first_candidates); $k++){
-for ($i=0 ; $i< strlen($letters); $i++){
-	$key = $first_candidates[$k].$letters[$i];
-	$data =  base64_encode(xor_encrypt(json_encode($defaultdata),$key));
-	if (strpos($cookie,substr($data,0,2)) !== false ){
-		echo $data;
-		echo " ";
-		echo $key;
-		echo "\n";
-}}}
-//
-//echo  base64_encode(xor_encrypt(json_encode($defaultdata),$best_match));
+$temp = [];
+$contador = 2;
+$found_key = false;
+while($contador < 10) {
+	for($k=0; $k < count($first_candidates); $k++){
+		if($contador<5){
+			for ($i=0 ; $i< strlen($letters); $i++){
+				$key = $first_candidates[$k].$letters[$i];
+				$data =  base64_encode(xor_encrypt(json_encode($defaultdata),$key));
+				if (substr($cookie,0,$contador)==substr($data,0,$contador) ){
+					echo $data;
+					echo " ";
+					echo $key;
+					$temp[] = $key;
+					echo "\n";
+				}
+			}
+		}
+		else{
+			$found_key = true;
+			$key = $first_candidates[$k];
+			$data =  base64_encode(xor_encrypt(json_encode($defaultdata),$key));
+			if (substr($cookie,0,$contador)==substr($data,0,$contador) ){
+				echo $data;
+				echo " ";
+				echo $key;
+				echo " ";
+				echo $contador;
+				$temp[] = $key;
+				echo "\n";
+				$best_match = $key;
+			}
+		}
+	}
+	if($found_key == false){
+		$first_candidates = $temp;
+		$temp = [];
+	}
+	$contador++;
+}
 
+$defaultdata = array( "showpassword"=>"yes", "bgcolor"=>"#ffffff");
+echo  base64_encode(xor_encrypt(json_encode($defaultdata),$best_match));
