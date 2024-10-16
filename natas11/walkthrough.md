@@ -31,18 +31,91 @@ $defaultdata = array( "showpassword"=>"no", "bgcolor"=>"#ffffff");
 
 $letters = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVNBM";
 
+$first_candidates = [];
+
 for ($i=0 ; $i< strlen($letters); $i++){
 	$data =  base64_encode(xor_encrypt(json_encode($defaultdata),$letters[$i]));
 	if ($cookie[0] == $data[0] ){
 		echo $data;
 		echo " ";
 		echo $letters[$i];
+		$first_candidates[] = $letters[$i];
 		echo "\n";
-}}
+	}
+}
 ```
-After we run the php code above, we see the following output:
-![alt text](output1.png)
-Looking at the output, we can clearly see that there are four candidates to be the first letter of the key, so to find out who is the right one, we will use brute force to find it.
+The code above, is useful because with that for loop we will find the first candidates of the key, if a letter doesn't match the first character of the cookie, we will discard it.
+Then we have the following part of the code 
+```php
 
-eDWo is the key
+$temp = [];
+$contador = 2;
+$found_key = false;
+while($contador < 5 || count($temp)!=1) {
+	$temp = [];
+	for($k=0; $k < count($first_candidates); $k++){
+		if($contador<5){
+			for ($i=0 ; $i< strlen($letters); $i++){
+				$key = $first_candidates[$k].$letters[$i];
+				$data =  base64_encode(xor_encrypt(json_encode($defaultdata),$key));
+				if (substr($cookie,0,$contador)==substr($data,0,$contador) ){
+					echo $data;
+					echo " ";
+					echo $key;
+					$temp[] = $key;
+					echo "\n";
+				}
+			}
+		}
+		else{
+			$found_key = true;
+			$key = $first_candidates[$k];
+			$data =  base64_encode(xor_encrypt(json_encode($defaultdata),$key));
+			if (substr($cookie,0,$contador)==substr($data,0,$contador) ){
+				echo $data;
+				echo " ";
+				echo $key;
+				echo " ";
+				echo $contador;
+				$temp[] = $key;
+				echo "\n";
+				$best_match = $key;
+			}
+		}
+	}
+	if($found_key == false) {
+		$first_candidates = $temp;
+	}
+
+	$contador++;
+}
+```
+I know is a lot to cover, but bear with me. First we declare some variables to store important information, *temp* will be use to store the list of keys, *contador* will be use to move the "pointer" of the two strings, and lastly *found_key* is a flag. 
+The condition for the while loop is quite simple, if the length of the temp array is one, it means that it found the key, and why contador has to be less than 5? I'll explained it later. Then inside the while loop we have brute force!  
+First we have a double for loop, that will generate all the possibles keys candidates and see if the encrypted data generated matches at least a substring of the cookie. And we will print the values for clarity. When contador is greater than 5, we can have a situation where we have more than one candidate to be the key, so to find out who is the real one, we will only focus on incrementing the *contador* variable until they temp array only has one element. And also we set *found_key* variable to be true, so the variable *first_candidates*, that nows stores the finals_candidates, doesn't lose the needed data. 
+
+And now, that we know that we found the real key, we will just simply modify the array, so when we put this new cookie in the storage, it will show us the password.
+
+```php
+$defaultdata = array( "showpassword"=>"yes", "bgcolor"=>"#ffffff");
+echo  base64_encode(xor_encrypt(json_encode($defaultdata),$best_match));
+```
+
+And this is the final part of the output: 
+
+![alt text](output.png)
+
 ### Changing the value
+So know that we found the key, we will change the value store in the cookies for this one HmYkBwozJw4WNyAAFyB1VUc9MhxHaHUNAic4Awo2dVVHZzEJAyIxCUc5, lets see what happens!
+
+![alt text](before.png)
+
+![alt text](after.png)
+
+We changed the value of the data cookie, so what will happen when we recharge the web browser???
+
+![alt text](finished.png)
+
+voilá, we found the password!! It's was a really intertaining exercise.
+Now one thing that I must declare is that, the value of contador was found by inspection, what I meand with this is that, in my first try I constructed the key by hand, to say in a way, because when I found the candidates, I was seeing which one matched the original cookie, and then started to add the real characters, and so on, and when I reach the four letters, the match was perfect. 
+That's all I have to say, if you reached this far, thanks you so much for your time, hope you learned something new while reading.

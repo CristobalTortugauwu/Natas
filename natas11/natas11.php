@@ -56,9 +56,10 @@ for ($i=0 ; $i< strlen($letters); $i++){
 $temp = [];
 $contador = 2;
 $found_key = false;
-while($contador < 10) {
+while($contador < 5 || count($temp)!=1) {
+	$temp = [];
 	for($k=0; $k < count($first_candidates); $k++){
-		if($contador<5){
+		if($contador<6){
 			for ($i=0 ; $i< strlen($letters); $i++){
 				$key = $first_candidates[$k].$letters[$i];
 				$data =  base64_encode(xor_encrypt(json_encode($defaultdata),$key));
@@ -87,10 +88,10 @@ while($contador < 10) {
 			}
 		}
 	}
-	if($found_key == false){
+	if($found_key == false) {
 		$first_candidates = $temp;
-		$temp = [];
 	}
+
 	$contador++;
 }
 
