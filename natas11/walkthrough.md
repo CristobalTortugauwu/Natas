@@ -1,15 +1,15 @@
 ## Natas 11 walkthrough
 
 First, after we put the correct credentials, the first thing we see here is this image:
-![alt text](frontend.png)
+![alt text](images/frontend.png)
 
 There are two things that are very useful in this frontend page, the first one is that they are telling us that they page is using XOR encryption for the cookies, and the second one, is that we can take a look at the sourcecode. 
 So we are going to take a look at the cookies, and we find that there is one named data, and has the following value. 
-![alt text](cookies.png)
+![alt text](images/cookies.png)
 
 and then we take a look at the source code
-![alt text](code1.png)
-![alt text](code2.png)
+![alt text](images/code1.png)
+![alt text](images/code2.png)
 
 we see that there is a variable called *defaultdata*, this variable contains two values, the most important one is *showpassword*, then we have a xor_encrypt function, and we can that the see $key variable is censored, so from this we can infere that we have to guess the key, in some way, we will see how later on!
 And then we have another two function called *loadData* and *saveData*. The first one takes the array, and then decrypts the data, using base64_decode, xor_encrypt and json_decode, then it does some questions about the content of the array, and finally returns the data decoded.
@@ -103,18 +103,18 @@ echo  base64_encode(xor_encrypt(json_encode($defaultdata),$best_match));
 
 And this is the final part of the output: 
 
-![alt text](output.png)
+![alt text](images/output.png)
 
 ### Changing the value
 So know that we found the key, we will change the value store in the cookies for this one HmYkBwozJw4WNyAAFyB1VUc9MhxHaHUNAic4Awo2dVVHZzEJAyIxCUc5, lets see what happens!
 
-![alt text](before.png)
+![alt text](images/before.png)
 
-![alt text](after.png)
+![alt text](images/after.png)
 
 We changed the value of the data cookie, so what will happen when we recharge the web browser???
 
-![alt text](finished.png)
+![alt text](images/finished.png)
 
 voilá, we found the password!! It's was a really intertaining exercise.
 Now one thing that I must declare is that, the value of contador was found by inspection, what I meand with this is that, in my first try I constructed the key by hand, to say in a way, because when I found the candidates, I was seeing which one matched the original cookie, and then started to add the real characters, and so on, and when I reach the four letters, the match was perfect. 
