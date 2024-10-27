@@ -89,6 +89,6 @@ def obtain_usernames(username,password,session,url):
     print(f"The users are \n: {full_name}")
     return full_name
 ```
-![alt text](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWlmdGtpdjc2ZW5jcW15MzF0ODNvMmFtaW05MDJ5NG43dDgzYXh6ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7mug9zTI8lR9OAWXUT/giphy.gif)
-
-
+<div style="text-align: center;">
+<img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWlmdGtpdjc2ZW5jcW15MzF0ODNvMmFtaW05MDJ5NG43dDgzYXh6ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7mug9zTI8lR9OAWXUT/giphy.gif">
+</div>
