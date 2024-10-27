@@ -89,12 +89,6 @@ def obtain_usernames(username,password,session,url):
     print(f"The users are \n: {full_name}")
     return full_name
 ```
-<figure>
-    <video width="320" height="240" controls>
-        <source src="media/video_get_names.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <figcaption>Video showing brute force of the usernames</figcaption>
-</figure>
+![alt text](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWlmdGtpdjc2ZW5jcW15MzF0ODNvMmFtaW05MDJ5NG43dDgzYXh6ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7mug9zTI8lR9OAWXUT/giphy.gif)
 
 
